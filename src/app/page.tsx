@@ -1,7 +1,5 @@
-import { SITE_ROUTES } from '@/constants';
-import { redirect } from 'next/navigation';
+import { FeedbackHome } from '@/features/feedback';
 
-const { APP } = SITE_ROUTES;
-const page = () => redirect(APP.DASHBOARD);
-
-export default page;
+export default function Page() {
+  return <FeedbackHome />;
+}

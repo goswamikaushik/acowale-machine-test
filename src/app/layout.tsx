@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { Geist } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/common';
+import { Toaster } from '@/components/ui/sonner';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -26,7 +27,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
