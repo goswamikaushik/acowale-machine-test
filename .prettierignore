@@ -1,0 +1,9 @@
+.husky
+.gitignore
+.next
+.husky
+.git
+.node_modules
+.cache
+.env
+.coverage

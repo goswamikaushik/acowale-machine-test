@@ -1,0 +1,23 @@
+# set -e immediately exits if a command exits with a non-zero status
+set -e
+
+echo ""
+echo "🏗️  Creating production build..."
+echo ""
+
+# build command
+pnpm build
+
+echo ""
+echo "📦  Build completed successfully."
+echo ""
+# echo "🚀  Running Test Suite..."
+# echo ""
+
+# test command
+# pnpm run test
+
+echo ""
+# echo "✅  All tests passed!"
+echo "🚀  Syncing your code to remote..."
+echo ""

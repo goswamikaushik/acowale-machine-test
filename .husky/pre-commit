@@ -1,0 +1,15 @@
+# set -e immediately exits if a command exits with a non-zero status
+set -e
+
+echo ""
+echo "🧪  Running pre-commit checks..."
+echo ""
+echo "🔍  Linting staged files and formatting code (eslint + prettier)..."
+echo ""
+
+# This command will run eslint and prettier on the staged files (check lint-staged.config.ts at the root)
+pnpm lint-staged
+
+echo ""
+echo "✅  Code quality checks passed!"
+echo ""
