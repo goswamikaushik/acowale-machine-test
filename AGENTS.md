@@ -17,13 +17,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Summary for AI agents
 
-Next.js 16.2.4 + React 19 frontend boilerplate (App Router, TypeScript strict, Tailwind v4, Redux Toolkit). Dev server: `pnpm dev` at `http://localhost:3000`. This version has breaking changes from Next.js ≤15 — middleware is `src/proxy.ts`, not `middleware.ts`.
+Next.js 16.2.4 + React 19 Customer Feedback Platform (App Router, TypeScript strict, Tailwind v4, Prisma ORM, Supabase/PostgreSQL). Dev server: `pnpm dev` at `http://localhost:3000`. This version has breaking changes from Next.js ≤15 — middleware is `src/proxy.ts`, not `middleware.ts`.
 
 Full context in [CLAUDE.md](CLAUDE.md) including:
 
 - **Middleware is `src/proxy.ts`** — do not create or edit `middleware.ts`
-- **Redux store is empty** — all slices commented out; `useAppSelector` returns nothing until slices are added
-- **Auth forms are UI scaffolding only** — no backend, no submit handlers wired up
+- **Feedback Database Schema** — category (enum), rating (int), feedback (text), userId (optional string), userName (optional string), userEmail (optional string), and createdAt (DateTime).
 - **React Compiler is enabled** — never add `useMemo`, `useCallback`, or `React.memo`
 - **All routes must go through `SITE_ROUTES`** in `src/constants/index.ts`
 

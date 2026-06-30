@@ -17,7 +17,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Product Context
 
-A production-ready Next.js 16 boilerplate with feature-based architecture, a full chart library showcase, auth page scaffolding, and a code-quality pipeline. It is a starting point for SaaS-style apps — authentication logic, API integration, and Redux slices are intentionally left empty for the builder to wire up.
+The Acowale CRM Customer Feedback Platform is a production-ready application that allows public users to submit structured customer feedback (categorized with comments, ratings, and user info) and allows the internal team to view, search, filter, and analyze feedback trends through a dynamic dashboard.
 
 ---
 
@@ -321,9 +321,14 @@ All of the following are already present in `src/components/ui/`. Check this lis
 
 ## Backend API Routes
 
-This is a frontend-only project. No API routes exist. No backend calls are made. All data is static mock data.
+The backend APIs handle data persistence and retrieval:
 
-When adding API calls: use `DOMAIN` from `@/lib/env` as the base URL, and add any server-side env vars to the Zod schema in [src/lib/env.ts](src/lib/env.ts).
+| Method | Endpoint         | Purpose                                                                                   |
+| ------ | ---------------- | ----------------------------------------------------------------------------------------- |
+| `POST` | `/api/feedback`  | Submit new customer feedback. Validates payload using Zod.                                |
+| `GET`  | `/api/feedback`  | Fetch all feedback submissions. Supports search, category filters, and rating filters.    |
+| `GET`  | `/api/analytics` | Fetch aggregated metrics (total count, average rating, category distribution, over-time). |
+| `GET`  | `/api/health`    | Health-check endpoint returning API status, database status, and timestamp.              |
 
 ---
 

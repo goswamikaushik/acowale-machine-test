@@ -1,113 +1,295 @@
-# Next.js Boilerplate
+# Acowale CRM Machine Test
 
-A production-ready Next.js 16 + React 19 boilerplate with feature-based architecture, a complete chart showcase, auth page scaffolding, and a strict code-quality pipeline.
+> Software Engineer Assignment Submission
 
-**Full documentation for developers and AI tools: [CLAUDE.md](CLAUDE.md)**
+**Candidate:** Kaushik Goswami
 
 ---
 
-## Quick Start
+## Overview
 
-```bash
-pnpm install
-pnpm dev    # http://localhost:3000 → auto-redirects to /dashboard
-```
+This project is my submission for the Acowale Software Engineer Machine Test.
 
-Requires `.env` at project root (already committed with dev defaults):
+The application is built as a production-oriented full-stack Next.js application that enables users to submit customer feedback and visualize analytics through an interactive dashboard.
 
-```env
-NEXT_PUBLIC_DOMAIN=http://localhost:3000
-```
+Rather than focusing solely on feature completion, the implementation emphasizes:
+
+- Clean Architecture
+- Scalability
+- Type Safety
+- Maintainability
+- Performance
+- Accessibility
+- Developer Experience
 
 ---
 
 ## Tech Stack
 
-| Layer           | Technology                       |
-| --------------- | -------------------------------- |
-| Framework       | Next.js 16.2.4 (App Router)      |
-| Language        | TypeScript 5 (strict)            |
-| Styling         | Tailwind CSS 4                   |
-| Components      | shadcn/ui (radix-nova) + Base UI |
-| Charts          | Recharts 3.8                     |
-| Tables          | TanStack Table 8                 |
-| State           | Redux Toolkit 2 + redux-persist  |
-| Env             | Zod 4 validation                 |
-| Package Manager | pnpm                             |
+### Frontend
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
+- React Hook Form
+- Zod
+- TanStack Query
+- Recharts
+
+### Backend
+
+- Next.js Route Handlers
+- Prisma ORM
+- Supabase PostgreSQL
+
+### Tooling
+
+- ESLint
+- Prettier
+- Husky
+- lint-staged
+- GitHub
 
 ---
 
-## Commands
+## Features
 
-| Command            | Purpose                                         |
-| ------------------ | ----------------------------------------------- |
-| `pnpm dev`         | Dev server                                      |
-| `pnpm build`       | Production build (runs lint + type-check first) |
-| `pnpm start`       | Production server                               |
-| `pnpm lint`        | ESLint                                          |
-| `pnpm prettier`    | Format all files                                |
-| `pnpm check-types` | TypeScript check (no emit)                      |
+### Feedback Form
 
-Add shadcn components: `pnpm dlx shadcn@latest add <component>`
-Update / overwrite all shadcn components: `pnpm dlx shadcn@latest add --all --overwrite --yes`
+- Submit customer feedback
+- Form validation using React Hook Form + Zod
+- Server-side validation
+- Success & error handling
+- Responsive UI
 
 ---
 
-## Key Conventions
+### Dashboard
 
-- **Middleware is `src/proxy.ts`**, not `middleware.ts` — Next.js 16 breaking change
-- **Never hardcode routes** — use `SITE_ROUTES` from `@/constants`
-- **Page files are thin shells** — all logic lives in `src/features/{group}/{feature}/`
-- **Never use `useSelector`/`useDispatch`** — use `useAppSelector`/`useAppDispatch` from `@/redux/hook`
-- **No `useMemo`/`useCallback`/`React.memo`** — React Compiler is enabled and handles this
-- **No `tailwind.config.js`** — Tailwind v4 config lives in CSS variables in `globals.css`
-- **Never access `process.env.*` directly** — import from `@/lib/env`
+- Total feedback count
+- Average rating
+- Feedback by category
+- Recent feedback list
+- Analytics charts
+- Search & filtering
+- Loading & empty states
 
-See [CLAUDE.md](CLAUDE.md) for the full rule set.
+---
+
+### APIs
+
+| Method | Endpoint |
+|---------|----------|
+| POST | /api/feedback |
+| GET | /api/feedback |
+| GET | /api/analytics |
+| GET | /api/health |
 
 ---
 
 ## Project Structure
 
 ```
-src/
-├── app/                    # Next.js App Router (thin page shells only)
-│   ├── (app)/              # Authenticated app routes: /dashboard, /profile, /charts
-│   ├── (auth)/             # Auth routes: /sign-in, /sign-up, /forgot-password
-│   ├── (marketing)/        # Public routes: /, /about, /contact-us, etc.
-│   ├── layout.tsx          # Root layout (fonts, metadata)
-│   ├── robots.ts           # /robots.txt
-│   └── sitemap.ts          # /sitemap.xml
-├── features/               # All actual page logic, co-located by feature
-│   ├── app/                # Dashboard, Profile, Charts components
-│   ├── auth/               # Sign-in, Sign-up, Forgot-password components
-│   └── marketing/          # About, Contact, Privacy, Terms components
-├── components/
-│   ├── ui/                 # shadcn/ui primitives
-│   ├── area-charts/        # Recharts area chart variants
-│   ├── bar-charts/         # Recharts bar chart variants
-│   ├── line-charts/        # Recharts line chart variants
-│   ├── pie-charts/         # Recharts pie/donut chart variants
-│   ├── radar-charts/       # Recharts radar chart variants
-│   ├── radial-charts/      # Recharts radial bar chart variants
-│   └── common/             # Shared reusable components
-├── constants/              # SITE_ROUTES, METADATA, mock data
-├── lib/                    # env.ts (Zod), utils.ts (cn)
-├── hooks/                  # use-mobile.ts
-├── redux/                  # store.ts, hook.ts
-└── proxy.ts                # Next.js 16 middleware (x-current-path header)
+src
+├── app
+│   ├── (dashboard)
+│   ├── api
+│   └── page.tsx
+│
+├── components
+│
+├── features
+│   ├── feedback
+│   └── analytics
+│
+├── hooks
+│
+├── lib
+│   ├── prisma.ts
+│   ├── validations
+│   └── utils
+│
+├── services
+│
+├── types
+│
+├── constants
+│
+└── styles
 ```
 
-See [CLAUDE.md](CLAUDE.md) for the file-by-file breakdown.
+---
+
+## Database
+
+Supabase PostgreSQL is used as the database provider.
+
+Prisma ORM manages:
+- Schema definition and migrations
+- Type-safe database client generation
+- Database queries and operations
+
+### Schema: `Feedback`
+
+The feedback data is persisted in a `Feedback` table with the following schema:
+
+| Field Name  | Type       | Description                                                      |
+| ----------- | ---------- | ---------------------------------------------------------------- |
+| `id`        | `String`   | Unique identifier (Primary Key, UUID)                            |
+| `category`  | `Enum`     | One of: `PRODUCT`, `FEATURE_REQUEST`, `SUPPORT`, `BILLING`       |
+| `rating`    | `Int`      | Score rating between 1 and 5 (for analytics and average ratings) |
+| `feedback`  | `Text`     | The detailed comment or feedback body text                       |
+| `userId`    | `String?`  | Optional ID of the user (nullable for public submissions)        |
+| `userName`  | `String?`  | Optional name of the user                                        |
+| `userEmail` | `String?`  | Optional email address (useful for follow-up)                    |
+| `createdAt` | `DateTime` | Timestamp when the feedback was submitted (defaults to now)      |
+
+---
+
+## Running Locally
+
+### Clone
+
+```bash
+git clone https://github.com/goswamikaushik/acowale-machine-test
+```
+
+### Install
+
+```bash
+pnpm install
+```
+
+### Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Update the required environment variables.
+
+### Generate Prisma Client
+
+```bash
+pnpm prisma generate
+```
+
+### Run Migrations
+
+```bash
+pnpm prisma migrate dev
+```
+
+### Start Development
+
+```bash
+pnpm dev
+```
 
 ---
 
 ## Environment Variables
 
-| Variable             | Required | Purpose                                    |
-| -------------------- | -------- | ------------------------------------------ |
-| `NEXT_PUBLIC_DOMAIN` | Yes      | Base URL for metadata, sitemap, robots.txt |
+```env
+DATABASE_URL=
+
+NEXT_PUBLIC_APP_URL=
+```
 
 ---
 
-See [CLAUDE.md](CLAUDE.md) for architecture decisions, known gotchas, NEVER-do rules, and the full feature reference.
+## Deployment
+
+| Service | Platform |
+|----------|----------|
+| Frontend | Vercel |
+| Database | Supabase |
+
+---
+
+## Engineering Decisions
+
+This project intentionally favors simplicity over unnecessary complexity.
+
+Key decisions:
+
+- Single full-stack Next.js application
+- Next.js Route Handlers instead of a separate backend
+- Prisma for type-safe database access
+- Feature-based architecture
+- Zod for runtime validation
+- TanStack Query for server state
+- Reusable UI components using shadcn/ui
+
+---
+
+## AI Usage
+
+AI tools were used responsibly during development.
+
+Tools used:
+
+- ChatGPT
+- Cursor
+
+AI assisted with:
+
+- Architecture discussions
+- Code review
+- Documentation
+- Brainstorming
+
+All implementation, debugging, testing, validation, and engineering decisions were reviewed and completed by me.
+
+---
+
+## Future Improvements
+
+- Authentication
+- Pagination
+- Export Analytics
+- Unit & Integration Tests
+- Role-Based Access Control
+- Docker Support
+- CI/CD Pipeline
+
+---
+
+## Starter Kit
+
+This project is built on top of my personal Next.js Starter Kit:
+
+https://github.com/goswamikaushik/nextjs-starter-kit
+
+The starter kit provides:
+
+- Feature-based architecture
+- TypeScript configuration
+- Tailwind CSS v4
+- shadcn/ui integration
+- Husky
+- lint-staged
+- ESLint
+- Prettier
+
+allowing me to focus on solving the engineering problem rather than project bootstrapping.
+
+---
+
+## Author
+
+Kaushik Goswami
+
+Portfolio
+
+https://goswamikaushik.dev
+
+GitHub
+
+https://github.com/goswamikaushik
+
+LinkedIn
+
+https://linkedin.com/in/goswamikaushik
