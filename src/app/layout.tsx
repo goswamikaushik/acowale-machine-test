@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { Geist } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
+import { ReduxProvider } from '@/redux/provider';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -26,7 +27,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        {children}
+        <ReduxProvider>{children}</ReduxProvider>
         <Toaster />
       </body>
     </html>

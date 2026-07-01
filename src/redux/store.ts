@@ -11,25 +11,18 @@ import {
   PersistConfig
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { feedbackApi } from './feedback-api';
 
 const persistConfig: PersistConfig<ReturnType<typeof appReducer>> = {
   key: 'root',
   version: 1,
-  storage
+  storage,
+  blacklist: [feedbackApi.reducerPath]
 };
 
 // --- App reducer ---
 const appReducer = combineReducers({
-  //   // Slices
-  //   auth: authSlice.reducer,
-  //   google: googleSlice.reducer,
-  //   resume: resumeSlice.reducer,
-  //   template: templateSlice.reducer,
-  //   // RTK Query API
-  //   [authApi.reducerPath]: authApi.reducer,
-  //   [googleApi.reducerPath]: googleApi.reducer,
-  //   [resumeApi.reducerPath]: resumeApi.reducer,
-  //   [templateApi.reducerPath]: templateApi.reducer
+  [feedbackApi.reducerPath]: feedbackApi.reducer
 });
 
 // --- Persisted reducer ---
@@ -43,7 +36,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
       }
-    })
+    }).concat(feedbackApi.middleware)
 });
 
 // --- Persistor ---
