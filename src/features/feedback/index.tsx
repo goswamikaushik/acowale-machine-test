@@ -2,35 +2,60 @@
 
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Heart, Mail, Send, ShieldCheck, User } from 'lucide-react';
-import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { StarRating } from '@/components/common';
 import { SITE_ROUTES } from '@/constants';
 import { categories } from '@/lib/mock-data';
+import { cn } from '@/lib/utils';
+import { Field, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+
+const feedbackSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+  email: z.email('Please enter a valid email address'),
+  category: z.enum(categories, {
+    message: 'Please select a valid category'
+  }),
+  rating: z.number({ message: 'Rating is required' }).max(5),
+  comment: z.string().max(500, 'Comment cannot exceed 500 characters')
+});
+
+type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 
 export default function FeedbackForm() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [category, setCategory] = useState('');
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !email || !category || !rating) {
-      toast.error('Please complete all required fields.');
-      return;
+  const { watch, handleSubmit, reset, control } = useForm<FeedbackFormValues>({
+    resolver: zodResolver(feedbackSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      category: undefined,
+      rating: 0,
+      comment: ''
     }
+  });
+
+  const watchRating = watch('rating');
+  const watchComment = watch('comment', '') || '';
+
+  const onSubmit = (data: FeedbackFormValues) => {
+    console.log('data', data);
     toast.success('Feedback submitted — thank you!');
-    setName('');
-    setEmail('');
-    setCategory('');
-    setRating(0);
-    setComment('');
+    reset();
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-6 pt-10 pb-20">
+    <div className="mx-auto w-auto px-6 pt-10 pb-20 md:w-3xl">
       <Link
         href={SITE_ROUTES.HOME}
         className="border-border bg-card text-muted-foreground shadow-soft hover:text-foreground inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors"
@@ -47,91 +72,141 @@ export default function FeedbackForm() {
       </div>
 
       <form
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="border-border/80 bg-card shadow-soft mt-10 rounded-3xl border p-6 sm:p-10"
       >
         <div className="grid gap-6 sm:grid-cols-2">
-          <Field label="Customer Name" required>
-            <InputWrap icon={<User className="h-4 w-4" />}>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
-                className="placeholder:text-muted-foreground/60 w-full bg-transparent text-sm outline-none"
-              />
-            </InputWrap>
-          </Field>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Customer Name</FieldLabel>
+                <InputGroup className="border-input h-13 rounded-2xl">
+                  <InputGroupAddon align="inline-start">
+                    <User className="text-muted-foreground size-4" />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Enter your full name"
+                    autoComplete="name"
+                    className="h-auto py-0"
+                  />
+                </InputGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <Field label="Email Address" required>
-            <InputWrap icon={<Mail className="h-4 w-4" />}>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="placeholder:text-muted-foreground/60 w-full bg-transparent text-sm outline-none"
-              />
-            </InputWrap>
-          </Field>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>
+                <InputGroup className="border-input h-13 rounded-2xl">
+                  <InputGroupAddon align="inline-start">
+                    <Mail className="text-muted-foreground size-4" />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    {...field}
+                    id={field.name}
+                    type="email"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Enter your email address"
+                    autoComplete="email"
+                    className="h-auto py-0"
+                  />
+                </InputGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <Field label="Category" required>
-            <div className="relative">
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="peer border-input bg-background focus:border-brand-purple focus:ring-brand-purple/15 w-full appearance-none rounded-2xl border px-4 py-3.5 text-sm transition-all outline-none focus:ring-4"
-              >
-                <option value="">Select a category</option>
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-              <svg
-                className="text-muted-foreground pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  d="M5.5 7.5l4.5 4.5 4.5-4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-          </Field>
+          <Controller
+            name="category"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="form-category">Category</FieldLabel>
+                <Select name={field.name} value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger
+                    id="form-category"
+                    aria-invalid={fieldState.invalid}
+                    className="border-input w-full rounded-2xl px-4 py-6"
+                  >
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent
+                    position="popper"
+                    className="bg-popover border-border rounded-2xl border"
+                  >
+                    {categories.map((c) => (
+                      <SelectItem key={c} value={c} className="rounded-xl">
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <Field label="Rating" required>
-            <div className="border-input bg-background flex h-13 items-center rounded-2xl border px-4">
-              <StarRating value={rating} onChange={setRating} size={26} />
-            </div>
-            <div className="text-muted-foreground mt-1.5 text-xs">
-              {rating ? `${rating} out of 5` : 'Select a rating'}
-            </div>
-          </Field>
+          <Controller
+            name="rating"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Rating</FieldLabel>
+                <div
+                  className={cn(
+                    'border-input bg-background flex h-13 items-center rounded-2xl border px-4 transition-all',
+                    fieldState.invalid && 'border-destructive ring-destructive/15 ring-4'
+                  )}
+                >
+                  <StarRating value={field.value} onChange={field.onChange} size={26} />
+                </div>
+                <FieldDescription>
+                  {watchRating ? `${watchRating} out of 5` : 'Select a rating'}
+                </FieldDescription>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
         </div>
 
         <div className="mt-6">
-          <Field label="Comment">
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value.slice(0, 500))}
-              placeholder="Share your feedback, suggestions, or comments..."
-              rows={5}
-              className="border-input bg-background placeholder:text-muted-foreground/60 focus:border-brand-purple focus:ring-brand-purple/15 w-full resize-none rounded-2xl border px-4 py-3.5 text-sm transition-all outline-none focus:ring-4"
-            />
-            <div className="text-muted-foreground mt-1.5 text-right text-xs">
-              {comment.length}/500
-            </div>
-          </Field>
+          <Controller
+            name="comment"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Comment</FieldLabel>
+                <Textarea
+                  {...field}
+                  id={field.name}
+                  maxLength={500}
+                  placeholder="Share your feedback, suggestions, or comments..."
+                  aria-invalid={fieldState.invalid}
+                  className="border-input min-h-32 rounded-2xl px-4 py-3.5"
+                />
+                <div className="mt-1.5 flex items-center justify-between">
+                  <div className="text-xs">
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </div>
+                  <div className="text-muted-foreground text-xs">{watchComment.length}/500</div>
+                </div>
+              </Field>
+            )}
+          />
         </div>
 
         <button
           type="submit"
-          className="bg-gradient-brand shadow-elegant hover:shadow-glow mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.99]"
+          className="bg-gradient-brand shadow-elegant hover:shadow-glow mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-6 py-4 text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.99]"
         >
           Submit Feedback <Send className="h-4 w-4" />
         </button>
@@ -147,37 +222,6 @@ export default function FeedbackForm() {
         Your feedback matters
         <ArrowRight className="h-4 w-4 opacity-0" />
       </div>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  required,
-  children
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-medium">
-        {label}
-        {required && <span className="text-brand-purple"> *</span>}
-      </span>
-      {children}
-    </label>
-  );
-}
-
-function InputWrap({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div className="group border-input bg-background focus-within:border-brand-purple focus-within:ring-brand-purple/15 flex items-center gap-2 rounded-2xl border px-4 py-3.5 transition-all focus-within:ring-4">
-      <span className="text-muted-foreground group-focus-within:text-brand-purple transition-colors">
-        {icon}
-      </span>
-      {children}
     </div>
   );
 }

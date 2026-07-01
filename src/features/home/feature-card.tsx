@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { FC } from 'react';
-import { FeatureCardProps } from '../type';
+import { FeatureCardProps } from './type';
 
 const FeatureCard: FC<FeatureCardProps> = ({ icon, title, description, ctaLabel, href }) => {
   return (
