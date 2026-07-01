@@ -31,5 +31,4 @@ export const METADATA: Record<string, Metadata> = {
     }
   }
 } as const;
-
 export const categories = ['Product', 'Service', 'Support', 'Billing', 'Other'] as const;

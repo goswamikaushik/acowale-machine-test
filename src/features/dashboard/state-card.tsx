@@ -1,9 +1,7 @@
-import { ArrowDown, ArrowUp } from 'lucide-react';
 import { FC } from 'react';
 import { StatCardProps } from './type';
 
-const StatCard: FC<StatCardProps> = ({ icon, iconBg, label, value, suffix, trend, positive }) => {
-  const TrendIcon = positive ? ArrowUp : ArrowDown;
+const StatCard: FC<StatCardProps> = ({ icon, iconBg, label, value, suffix }) => {
   return (
     <div className="group border-border/80 bg-card shadow-soft hover:shadow-elegant relative overflow-hidden rounded-3xl border p-5 transition-all hover:-translate-y-0.5">
       <div className="flex items-center gap-4">
@@ -19,13 +17,6 @@ const StatCard: FC<StatCardProps> = ({ icon, iconBg, label, value, suffix, trend
             {suffix && <span className="text-muted-foreground text-xs">{suffix}</span>}
           </div>
         </div>
-      </div>
-      <div
-        className={`mt-3 inline-flex items-center gap-1 text-xs font-medium ${positive ? 'text-emerald' : 'text-rose'}`}
-      >
-        <TrendIcon className="h-3 w-3" />
-        {trend}
-        <span className="text-muted-foreground font-normal">from last month</span>
       </div>
     </div>
   );

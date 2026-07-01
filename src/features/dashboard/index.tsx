@@ -1,33 +1,51 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  ArrowDown,
-  ArrowLeft,
-  MessageSquare,
-  Search,
-  Star,
-  ThumbsDown,
-  ThumbsUp,
-  Users
-} from 'lucide-react';
+import { ArrowLeft, MessageSquare, Search, Users } from 'lucide-react';
 import { useState } from 'react';
 import { CategoryBadge, StarRating } from '@/components/common';
-import { SITE_ROUTES } from '@/constants';
-import { categories, recentFeedback } from '@/lib/mock-data';
+import { ChartPieDonut } from './category-distribution';
+import { categories, SITE_ROUTES } from '@/constants';
+import { useGetFeedbacksQuery } from '@/redux/feedback-api';
 import StatCard from './state-card';
 import Panel from './panel';
 
 export default function Dashboard() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<string>('All');
+  const { data, isLoading } = useGetFeedbacksQuery();
 
-  const rows = recentFeedback.filter((r) => {
-    const matchesQ =
-      !query || (r.name + r.comment + r.email).toLowerCase().includes(query.toLowerCase());
-    const matchesCat = filter === 'All' || r.category === filter;
-    return matchesQ && matchesCat;
-  });
+  if (isLoading) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <div className="border-brand-purple h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  // Filter and format feedbacks for the table
+  const rows = data
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      email: r.email,
+      rating: r.rating,
+      category: r.category || 'Other',
+      comment: r.comment || 'No comment',
+      date: new Date(r.created_at).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })
+    }))
+    .filter((r) => {
+      const matchesQ =
+        !query || (r.name + r.comment + r.email).toLowerCase().includes(query.toLowerCase());
+      const matchesCat = filter === 'All' || r.category === filter;
+      return matchesQ && matchesCat;
+    });
 
   return (
     <div className="mx-auto max-w-7xl px-6 pt-10 pb-20">
@@ -75,107 +93,80 @@ export default function Dashboard() {
           icon={<Users className="text-brand-blue h-5 w-5" />}
           iconBg="bg-brand-blue/10"
           label="Total Feedback"
-          value="1,248"
-          trend="+12.5%"
-          positive
-        />
-        <StatCard
-          icon={<Star className="fill-amber text-amber h-5 w-5" />}
-          iconBg="bg-[color:var(--amber)]/10"
-          label="Average Rating"
-          value="4.2"
-          suffix="/ 5"
-          trend="+0.3"
-          positive
-        />
-        <StatCard
-          icon={<ThumbsUp className="text-emerald h-5 w-5" />}
-          iconBg="bg-[color:var(--emerald)]/10"
-          label="Positive Feedback"
-          value="85%"
-          trend="+8.2%"
-          positive
-        />
-        <StatCard
-          icon={<ThumbsDown className="text-rose h-5 w-5" />}
-          iconBg="bg-[color:var(--rose)]/10"
-          label="Negative Feedback"
-          value="15%"
-          trend="-3.1%"
-          positive
+          value={data.length.toLocaleString()}
         />
       </div>
 
-      <div className="mt-8">
-        <Panel
-          title="Recent Feedback"
-          icon={<MessageSquare className="text-muted-foreground h-4 w-4" />}
-        >
-          <div className="-mx-2 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-muted-foreground text-left text-xs tracking-wide uppercase">
-                  <th className="px-3 py-2 font-medium">Customer</th>
-                  <th className="px-3 py-2 font-medium">Category</th>
-                  <th className="px-3 py-2 font-medium">Rating</th>
-                  <th className="px-3 py-2 font-medium">Comment</th>
-                  <th className="px-3 py-2 font-medium">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr
-                    key={r.id}
-                    className="group border-border/70 hover:bg-accent/40 border-t transition-colors"
-                  >
-                    <td className="px-3 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-gradient-brand shadow-soft flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white">
-                          {r.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .slice(0, 2)
-                            .join('')}
-                        </div>
-                        <div className="leading-tight">
-                          <div className="font-medium">{r.name}</div>
-                          <div className="text-muted-foreground text-xs">{r.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3.5">
-                      <CategoryBadge category={r.category} />
-                    </td>
-                    <td className="px-3 py-3.5">
-                      <StarRating value={r.rating} readOnly size={14} />
-                    </td>
-                    <td className="text-muted-foreground max-w-xs truncate px-3 py-3.5">
-                      {r.comment}
-                    </td>
-                    <td className="text-muted-foreground px-3 py-3.5 whitespace-nowrap">
-                      {r.date}
-                    </td>
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <Panel
+            title="Recent Feedback"
+            icon={<MessageSquare className="text-muted-foreground h-4 w-4" />}
+          >
+            <div className="-mx-2 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-muted-foreground text-left text-xs tracking-wide uppercase">
+                    <th className="px-3 py-2 font-medium">Customer</th>
+                    <th className="px-3 py-2 font-medium">Category</th>
+                    <th className="px-3 py-2 font-medium">Rating</th>
+                    <th className="px-3 py-2 font-medium">Comment</th>
+                    <th className="px-3 py-2 font-medium">Date</th>
                   </tr>
-                ))}
-                {!rows.length && (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="text-muted-foreground px-3 py-16 text-center text-sm"
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr
+                      key={r.id}
+                      className="group border-border/70 hover:bg-accent/40 border-t transition-colors"
                     >
-                      No feedback matches your filter.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-4 flex justify-center">
-            <button className="border-border bg-card text-muted-foreground shadow-soft hover:text-foreground inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors">
-              Load More <ArrowDown className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </Panel>
+                      <td className="px-3 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-gradient-brand shadow-soft flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white">
+                            {r.name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .slice(0, 2)
+                              .join('')}
+                          </div>
+                          <div className="leading-tight">
+                            <div className="font-medium">{r.name}</div>
+                            <div className="text-muted-foreground text-xs">{r.email}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3.5">
+                        <CategoryBadge category={r.category} />
+                      </td>
+                      <td className="px-3 py-3.5">
+                        <StarRating value={r.rating} readOnly size={14} />
+                      </td>
+                      <td className="text-muted-foreground max-w-xs truncate px-3 py-3.5">
+                        {r.comment}
+                      </td>
+                      <td className="text-muted-foreground px-3 py-3.5 whitespace-nowrap">
+                        {r.date}
+                      </td>
+                    </tr>
+                  ))}
+                  {!rows.length && (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="text-muted-foreground px-3 py-16 text-center text-sm"
+                      >
+                        No feedback matches your filter.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+        </div>
+        <div className="lg:col-span-1">
+          <ChartPieDonut data={data} />
+        </div>
       </div>
     </div>
   );

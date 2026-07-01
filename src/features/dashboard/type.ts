@@ -4,8 +4,6 @@ export interface StatCardProps {
   label: string;
   value: string;
   suffix?: string;
-  trend: string;
-  positive: boolean;
 }
 
 export interface PanelProps {
