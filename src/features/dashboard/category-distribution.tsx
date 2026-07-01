@@ -54,7 +54,7 @@ export function ChartPieDonut({ data }: ChartPieDonutProps) {
   const totalFeedback = data.length;
 
   return (
-    <Card className="border-border/80 bg-card shadow-soft flex h-full flex-col rounded-3xl border">
+    <Card className="border-border/80 bg-card shadow-soft flex flex-col rounded-3xl border">
       <CardHeader className="items-center pb-2">
         <CardTitle className="text-lg font-bold">Category Distribution</CardTitle>
         <CardDescription>Real-time Customer Feedback</CardDescription>
