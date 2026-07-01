@@ -9,6 +9,7 @@ import { categories, SITE_ROUTES } from '@/constants';
 import { useGetFeedbacksQuery } from '@/redux/feedback-api';
 import StatCard from './state-card';
 import Panel from './panel';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function Dashboard() {
   const [query, setQuery] = useState('');
@@ -63,6 +64,15 @@ export default function Dashboard() {
             Monitor customer feedback insights and analytics
           </p>
         </div>
+      </div>
+
+      <div className="mt-8 flex items-start justify-between">
+        <StatCard
+          icon={<Users className="text-brand-blue h-5 w-5" />}
+          iconBg="bg-brand-blue/10"
+          label="Total Feedback"
+          value={data.length.toLocaleString()}
+        />
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
@@ -88,17 +98,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          icon={<Users className="text-brand-blue h-5 w-5" />}
-          iconBg="bg-brand-blue/10"
-          label="Total Feedback"
-          value={data.length.toLocaleString()}
-        />
-      </div>
-
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="mt-8 grid gap-6 lg:grid-cols-4">
+        <div className="lg:col-span-3">
           <Panel
             title="Recent Feedback"
             icon={<MessageSquare className="text-muted-foreground h-4 w-4" />}
@@ -141,8 +142,12 @@ export default function Dashboard() {
                       <td className="px-3 py-3.5">
                         <StarRating value={r.rating} readOnly size={14} />
                       </td>
-                      <td className="text-muted-foreground max-w-xs truncate px-3 py-3.5">
-                        {r.comment}
+                      <td className="text-muted-foreground max-w-3xs truncate px-3 py-3.5">
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <TooltipContent>{r.comment}</TooltipContent>
+                          </TooltipTrigger>
+                        </Tooltip>
                       </td>
                       <td className="text-muted-foreground px-3 py-3.5 whitespace-nowrap">
                         {r.date}
