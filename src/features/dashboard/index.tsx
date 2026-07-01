@@ -50,43 +50,47 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 pt-10 pb-20">
-      <div className="flex flex-wrap items-center gap-4">
-        <Link
-          href={SITE_ROUTES.HOME}
-          className="border-border bg-card text-muted-foreground shadow-soft hover:text-foreground inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
-        <div className="flex-1 text-center">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Analytics Dashboard</h1>
-          <p className="text-muted-foreground text-xs sm:text-sm">
-            Monitor customer feedback insights and analytics
-          </p>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-4">
+          <Link
+            href={SITE_ROUTES.HOME}
+            className="border-border bg-card text-muted-foreground shadow-soft hover:text-foreground inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Link>
+          <div className="text-left">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Analytics Dashboard</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm">
+              Monitor customer feedback insights and analytics
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="mt-8 flex items-start justify-between">
-        <StatCard
-          icon={<Users className="text-brand-blue h-5 w-5" />}
-          iconBg="bg-brand-blue/10"
-          label="Total Feedback"
-          value={data.length.toLocaleString()}
-        />
-        <div className="flex items-center gap-2">
-          <div className="relative">
+      <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="w-full md:w-auto">
+          <StatCard
+            icon={<Users className="text-brand-blue h-5 w-5" />}
+            iconBg="bg-brand-blue/10"
+            label="Total Feedback"
+            value={data.length.toLocaleString()}
+          />
+        </div>
+        <div className="flex w-full flex-col gap-2 min-[480px]:flex-row min-[480px]:items-center md:w-auto">
+          <div className="relative w-full min-[480px]:w-56">
             <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search feedback…"
-              className="border-input bg-card focus:border-brand-purple focus:ring-brand-purple/15 w-44 rounded-full border py-2 pr-3 pl-9 text-sm transition-all outline-none focus:ring-4 sm:w-56"
+              className="border-input bg-card focus:border-brand-purple focus:ring-brand-purple/15 w-full rounded-full border py-2 pr-3 pl-9 text-sm transition-all outline-none focus:ring-4"
             />
           </div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="border-input bg-card focus:border-brand-purple focus:ring-brand-purple/15 rounded-full border px-3 py-2 text-sm outline-none focus:ring-4"
+            className="border-input bg-card focus:border-brand-purple focus:ring-brand-purple/15 w-full rounded-full border px-3 py-2 text-sm outline-none focus:ring-4 min-[480px]:w-auto"
           >
             <option value="All">All Categories</option>
             {categories.map((c) => (
@@ -142,11 +146,16 @@ export default function Dashboard() {
                       <td className="px-3 py-3.5">
                         <StarRating value={r.rating} readOnly size={14} />
                       </td>
-                      <td className="text-muted-foreground max-w-3xs truncate px-3 py-3.5">
+                      <td className="text-muted-foreground max-w-[150px] px-3 py-3.5">
                         <Tooltip>
-                          <TooltipTrigger>
-                            <TooltipContent>{r.comment}</TooltipContent>
+                          <TooltipTrigger asChild>
+                            <span className="block max-w-full cursor-help truncate text-left">
+                              {r.comment}
+                            </span>
                           </TooltipTrigger>
+                          <TooltipContent className="max-w-xs break-words">
+                            {r.comment}
+                          </TooltipContent>
                         </Tooltip>
                       </td>
                       <td className="text-muted-foreground px-3 py-3.5 whitespace-nowrap">
