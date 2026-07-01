@@ -34,7 +34,7 @@ export default function Dashboard() {
       email: r.email,
       rating: r.rating,
       category: r.category || 'Other',
-      comment: r.comment || 'No comment',
+      comment: r.comment || '',
       date: new Date(r.created_at).toLocaleDateString(undefined, {
         month: 'short',
         day: 'numeric',
