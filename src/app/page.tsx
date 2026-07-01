@@ -1,5 +1,5 @@
-import { FeedbackHome } from '@/features/feedback';
+import Home from '@/features/home';
 
 export default function Page() {
-  return <FeedbackHome />;
+  return <Home />;
 }
