@@ -32,6 +32,4 @@ export const METADATA: Record<string, Metadata> = {
   }
 } as const;
 
-export const SOCIAL_LINKS = {
-  COMPANY_WEBSITE: 'https://goswamikaushik.dev'
-};
+export const categories = ['Product', 'Service', 'Support', 'Billing', 'Other'] as const;

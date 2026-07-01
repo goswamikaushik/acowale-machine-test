@@ -6,6 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { useAddFeedbackMutation } from '@/redux/feedback-api';
 import { StarRating } from '@/components/common';
 import { SITE_ROUTES } from '@/constants';
 import { categories } from '@/lib/mock-data';
@@ -27,13 +28,18 @@ const feedbackSchema = z.object({
   category: z.enum(categories, {
     message: 'Please select a valid category'
   }),
-  rating: z.number({ message: 'Rating is required' }).max(5),
+  rating: z
+    .number({ message: 'Rating is required' })
+    .min(1, 'Rating must be at least 1 star')
+    .max(5),
   comment: z.string().max(500, 'Comment cannot exceed 500 characters')
 });
 
 type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 
 export default function FeedbackForm() {
+  const [addFeedback, { isLoading }] = useAddFeedbackMutation();
+
   const { watch, handleSubmit, reset, control } = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
@@ -48,10 +54,15 @@ export default function FeedbackForm() {
   const watchRating = watch('rating');
   const watchComment = watch('comment', '') || '';
 
-  const onSubmit = (data: FeedbackFormValues) => {
-    console.log('data', data);
-    toast.success('Feedback submitted — thank you!');
-    reset();
+  const onSubmit = async (data: FeedbackFormValues) => {
+    try {
+      await addFeedback(data).unwrap();
+      toast.success('Feedback submitted. Thank you!');
+      reset();
+    } catch (err) {
+      console.error('Failed to submit feedback', err);
+      toast.error('Failed to submit feedback');
+    }
   };
 
   return (
@@ -206,9 +217,10 @@ export default function FeedbackForm() {
 
         <button
           type="submit"
-          className="bg-gradient-brand shadow-elegant hover:shadow-glow mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-6 py-4 text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.99]"
+          disabled={isLoading}
+          className="bg-gradient-brand shadow-elegant hover:shadow-glow mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-6 py-4 text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Submit Feedback <Send className="h-4 w-4" />
+          {isLoading ? 'Submitting...' : 'Submit Feedback'} <Send className="h-4 w-4" />
         </button>
 
         <div className="text-muted-foreground mt-4 flex items-center justify-center gap-2 text-xs">
