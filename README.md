@@ -1,16 +1,12 @@
 # Acowale CRM Machine Test
 
-> Software Engineer Assignment Submission
-
 **Candidate:** Kaushik Goswami
-
----
 
 ## Overview
 
 This project is my submission for the Acowale Software Engineer Machine Test.
 
-The application is built as a production-oriented full-stack Next.js application that enables users to submit customer feedback and visualize analytics through an interactive dashboard.
+The application is built as a production-oriented customer feedback and analytics system that enables users to submit customer feedback and visualize analytics through an interactive dashboard.
 
 Rather than focusing solely on feature completion, the implementation emphasizes:
 
@@ -35,14 +31,13 @@ Rather than focusing solely on feature completion, the implementation emphasizes
 - shadcn/ui
 - React Hook Form
 - Zod
-- TanStack Query
 - Recharts
+- Redux Toolkit (RTK Query)
 
-### Backend
+### Backend & Database
 
-- Next.js Route Handlers
-- Prisma ORM
-- Supabase PostgreSQL
+- Supabase (PostgreSQL with RLS)
+- Supabase JS SDK (direct client-side integration via RTK Query)
 
 ### Tooling
 
@@ -60,7 +55,6 @@ Rather than focusing solely on feature completion, the implementation emphasizes
 
 - Submit customer feedback
 - Form validation using React Hook Form + Zod
-- Server-side validation
 - Success & error handling
 - Responsive UI
 
@@ -68,24 +62,10 @@ Rather than focusing solely on feature completion, the implementation emphasizes
 
 ### Dashboard
 
-- Total feedback count
-- Average rating
-- Feedback by category
-- Recent feedback list
-- Analytics charts
-- Search & filtering
+- Total feedback count KPI card
+- Feedback by category donut chart distribution
+- Recent feedback list with search & category filtering (client-side)
 - Loading & empty states
-
----
-
-### APIs
-
-| Method | Endpoint |
-|---------|----------|
-| POST | /api/feedback |
-| GET | /api/feedback |
-| GET | /api/analytics |
-| GET | /api/health |
 
 ---
 
@@ -94,57 +74,55 @@ Rather than focusing solely on feature completion, the implementation emphasizes
 ```
 src
 ├── app
-│   ├── (dashboard)
-│   ├── api
-│   └── page.tsx
+│   ├── dashboard      # Dashboard page route
+│   ├── feedback       # Feedback form page route
+│   ├── layout.tsx     # Root layout
+│   └── page.tsx       # Redirects to home/dashboard
 │
 ├── components
+│   ├── common         # Reusable components (CategoryBadge, StarRating)
+│   └── ui             # shadcn-managed primitives
+│
+├── constants          # SITE_ROUTES, categories, etc.
 │
 ├── features
-│   ├── feedback
-│   └── analytics
+│   ├── dashboard      # Dashboard feature components
+│   ├── feedback       # Feedback form feature components
+│   └── home           # Home landing component
 │
 ├── hooks
 │
 ├── lib
-│   ├── prisma.ts
-│   ├── validations
-│   └── utils
+│   ├── env.ts         # Environment validation
+│   ├── supabase.ts    # Supabase client initialization
+│   └── utils.ts       # Utility functions (cn)
 │
-├── services
-│
-├── types
-│
-├── constants
-│
-└── styles
+└── redux
+    ├── feedback-api.ts # RTK Query slice for Supabase
+    ├── hook.ts         # Typed hooks
+    ├── provider.tsx    # Redux Provider wrapper
+    └── store.ts        # Redux store configuration
 ```
 
 ---
 
 ## Database
 
-Supabase PostgreSQL is used as the database provider.
+Supabase PostgreSQL is used as the database provider. Data fetching and mutation are managed client-side using Redux Toolkit Query (RTK Query) wrapping the Supabase client SDK.
 
-Prisma ORM manages:
-- Schema definition and migrations
-- Type-safe database client generation
-- Database queries and operations
+### Schema: `feedbacks`
 
-### Schema: `Feedback`
+The feedback data is persisted in a `feedbacks` table with the following schema:
 
-The feedback data is persisted in a `Feedback` table with the following schema:
-
-| Field Name  | Type       | Description                                                      |
-| ----------- | ---------- | ---------------------------------------------------------------- |
-| `id`        | `String`   | Unique identifier (Primary Key, UUID)                            |
-| `category`  | `Enum`     | One of: `PRODUCT`, `FEATURE_REQUEST`, `SUPPORT`, `BILLING`       |
-| `rating`    | `Int`      | Score rating between 1 and 5 (for analytics and average ratings) |
-| `feedback`  | `Text`     | The detailed comment or feedback body text                       |
-| `userId`    | `String?`  | Optional ID of the user (nullable for public submissions)        |
-| `userName`  | `String?`  | Optional name of the user                                        |
-| `userEmail` | `String?`  | Optional email address (useful for follow-up)                    |
-| `createdAt` | `DateTime` | Timestamp when the feedback was submitted (defaults to now)      |
+| Field Name   | Type       | Description                                                      |
+| ------------ | ---------- | ---------------------------------------------------------------- |
+| `id`         | `UUID`     | Unique identifier (Primary Key, Auto-generated)                  |
+| `name`       | `Text`     | Customer name                                                    |
+| `email`      | `Text`     | Email address of the customer                                    |
+| `rating`     | `Int`      | Score rating between 1 and 5 (for analytics and average ratings) |
+| `category`   | `Text`     | One of: `Product`, `Service`, `Support`, `Billing`, `Other`      |
+| `comment`    | `Text`     | Detailed comment or feedback body text                           |
+| `created_at` | `DateTime` | Timestamp when the feedback was submitted (defaults to now)      |
 
 ---
 
@@ -162,26 +140,6 @@ git clone https://github.com/goswamikaushik/acowale-machine-test
 pnpm install
 ```
 
-### Configure Environment
-
-```bash
-cp .env.example .env
-```
-
-Update the required environment variables.
-
-### Generate Prisma Client
-
-```bash
-pnpm prisma generate
-```
-
-### Run Migrations
-
-```bash
-pnpm prisma migrate dev
-```
-
 ### Start Development
 
 ```bash
@@ -193,66 +151,19 @@ pnpm dev
 ## Environment Variables
 
 ```env
-DATABASE_URL=
-
-NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_DOMAIN=http://localhost:3000
+NEXT_PUBLIC_PROJECT_URL=
+NEXT_PUBLIC_PUBLISHABLE_KEY=
 ```
-
----
-
-## Deployment
-
-| Service | Platform |
-|----------|----------|
-| Frontend | Vercel |
-| Database | Supabase |
-
----
-
-## Engineering Decisions
-
-This project intentionally favors simplicity over unnecessary complexity.
-
-Key decisions:
-
-- Single full-stack Next.js application
-- Next.js Route Handlers instead of a separate backend
-- Prisma for type-safe database access
-- Feature-based architecture
-- Zod for runtime validation
-- TanStack Query for server state
-- Reusable UI components using shadcn/ui
-
----
-
-## AI Usage
-
-AI tools were used responsibly during development.
-
-Tools used:
-
-- ChatGPT
-- Cursor
-
-AI assisted with:
-
-- Architecture discussions
-- Code review
-- Documentation
-- Brainstorming
-
-All implementation, debugging, testing, validation, and engineering decisions were reviewed and completed by me.
 
 ---
 
 ## Future Improvements
 
-- Authentication
-- Pagination
-- Export Analytics
-- Unit & Integration Tests
-- Role-Based Access Control
-- Docker Support
+- Authentication (Auth-gated feedback submission & dashboard access)
+- Pagination (Server-side pagination for feedback list)
+- Export Analytics (CSV/PDF export of dashboard insights)
+- Unit & E2E Tests (Jest & Playwright setup)
 - CI/CD Pipeline
 
 ---
