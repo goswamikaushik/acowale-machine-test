@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Heart, Mail, Send, ShieldCheck, User } from 'lucide-react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -39,7 +39,7 @@ type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 export default function FeedbackForm() {
   const [addFeedback, { isLoading }] = useAddFeedbackMutation();
 
-  const { watch, handleSubmit, reset, control } = useForm<FeedbackFormValues>({
+  const { handleSubmit, reset, control } = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
       name: '',
@@ -50,8 +50,8 @@ export default function FeedbackForm() {
     }
   });
 
-  const watchRating = watch('rating');
-  const watchComment = watch('comment', '') || '';
+  const watchRating = useWatch({ control, name: 'rating' });
+  const watchComment = useWatch({ control, name: 'comment' }) || '';
 
   const onSubmit = async (data: FeedbackFormValues) => {
     try {

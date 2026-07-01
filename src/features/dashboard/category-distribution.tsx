@@ -44,7 +44,7 @@ export function ChartPieDonut({ data }: ChartPieDonutProps) {
   });
 
   const chartData = Object.entries(categoryCounts)
-    .filter(([_, count]) => count > 0)
+    .filter(([, count]) => count > 0)
     .map(([category, count]) => ({
       category,
       count,
