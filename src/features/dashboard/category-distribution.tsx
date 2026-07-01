@@ -86,7 +86,9 @@ export function ChartPieDonut({ data }: ChartPieDonutProps) {
                   <div
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
                     style={{
-                      backgroundColor: chartConfig[item.category as keyof typeof chartConfig]?.color
+                      backgroundColor: (
+                        chartConfig[item.category as keyof typeof chartConfig] as { color?: string }
+                      )?.color
                     }}
                   />
                   <span className="text-foreground font-medium">{item.category}</span>
